@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import './App.css'
-// 1. Описываем интерфейс структуры транзакции для TypeScript
+
 interface Transaction {
   id: number
   title: string
