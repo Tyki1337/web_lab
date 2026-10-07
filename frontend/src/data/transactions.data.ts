@@ -47,3 +47,4 @@ export const transactions: Transaction[] = [
     note: "Учебное пособие по React и TypeScript.",
   },
 ];
+

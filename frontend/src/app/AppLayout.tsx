@@ -1,22 +1,21 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { Outlet, Link } from "react-router-dom";
 
 export function AppLayout() {
   return (
-    <div className="app">
-      <header className="app-header">
-        <p className="app-title">Expense Tracker</p>
-        <nav aria-label="Основная навигация">
-          <NavLink to="/transactions" end>
-            Операции
-          </NavLink>
-          <NavLink to="/transactions/new">
-            Создать
-          </NavLink>
+    <div className="layout">
+      {/* Шапка с разделением названия и ссылок */}
+      <header className="header">
+        <div className="brand">Expense Tracker</div>
+        <nav className="nav">
+          <Link to="/transactions">Операции</Link>
+          <Link to="/transactions/new">Создать</Link>
         </nav>
       </header>
-      <main className="app-content">
+
+      {/* Контейнер страницы */}
+      <main className="main-content">
         <Outlet />
       </main>
     </div>
-  )
+  );
 }

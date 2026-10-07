@@ -1,27 +1,27 @@
-import { Link } from 'react-router-dom'
-import type { Transaction } from '../types/transaction.type'
-
-type TransactionCardProps = {
-  transaction: Transaction
-}
+import { Link } from "react-router-dom";
+import type { TransactionCardProps } from "../types/transaction.type";
 
 export function TransactionCard({ transaction }: TransactionCardProps) {
-  const isIncome = transaction.type === 'income'
+  const isIncome = transaction.type === "income";
 
   return (
-    <article className={`transaction-card ${transaction.type}`}>
-      <div className="info">
-        <h2>
-          <Link to={`/transactions/${transaction.id}`}>{transaction.title}</Link>
-        </h2>
-        <span className="category">{transaction.category}</span>
+    <article className="transaction-card">
+      <div className="card-info">
+        <h3 className="card-title">
+          <Link to={`/transactions/${transaction.id}`}>
+            {transaction.title}
+          </Link>
+        </h3>
+        <span className="card-category">{transaction.category}</span>
       </div>
-      <div className="meta">
-        <span className="amount">
-          {isIncome ? '+' : '-'}{transaction.amount} ₽
+
+      <div className="card-meta">
+        <span className={`card-amount ${isIncome ? "income" : "expense"}`}>
+          {isIncome ? "+" : "-"}
+          {Math.abs(transaction.amount)} ₽
         </span>
-        <span className="date">{transaction.date}</span>
+        <time className="card-date">{transaction.date}</time>
       </div>
     </article>
-  )
+  );
 }

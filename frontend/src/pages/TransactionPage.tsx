@@ -1,51 +1,64 @@
-import { Link } from 'react-router-dom'
-import { TransactionCard } from '../components/TransactionCard'
-import { transactions } from '../data/transactions.data'
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { TransactionCard } from '../components/TransactionCard';
+import type { Transaction, TransactionType } from '../types/transaction.type';
 
-export function TransactionPage() {
-  const totalIncome = transactions
-    .filter((t) => t.type === 'income')
-    .reduce((sum, t) => sum + t.amount, 0)
+type TransactionPageProps = {
+  transactions: Transaction[];
+};
 
-  const totalExpense = transactions
-    .filter((t) => t.type === 'expense')
-    .reduce((sum, t) => sum + t.amount, 0)
+export function TransactionPage({ transactions }: TransactionPageProps) {
+  const [typeFilter, setTypeFilter] = useState<TransactionType | 'all'>('all');
 
-  const balance = totalIncome - totalExpense
+  const visibleTransactions = transactions.filter(
+    (item) => typeFilter === 'all' || item.type === typeFilter
+  );
 
   return (
     <section>
-      <div className="page-header">
-        <h1>История операций</h1>
-        <Link to="/transactions/new" className="btn">
-          Добавить операцию
-        </Link>
-      </div>
+      <h1>Список транзакций</h1>
 
-      <div className="summary-section">
-        <div className={`summary-card ${balance >= 0 ? 'positive' : 'negative'}`}>
-          <span>Баланс:</span>
-          <strong>{balance} ₽</strong>
-        </div>
-        <div className="summary-card income">
-          <span>Доходы:</span>
-          <strong>+{totalIncome} ₽</strong>
-        </div>
-        <div className="summary-card expense">
-          <span>Расходы:</span>
-          <strong>-{totalExpense} ₽</strong>
-        </div>
+      <div
+        className="filter-panel"
+        style={{ marginBottom: '20px', display: 'flex', gap: '10px', alignItems: 'center' }}
+      >
+        <label htmlFor="filter-type">Фильтр по типу:</label>
+        <select
+          id="filter-type"
+          value={typeFilter}
+          onChange={(e) => setTypeFilter(e.target.value as TransactionType | 'all')}
+        >
+          <option value="all">Все</option>
+          <option value="income">Доходы</option>
+          <option value="expense">Расходы</option>
+        </select>
+
+        {typeFilter !== 'all' && (
+          <button type="button" onClick={() => setTypeFilter('all')}>
+            Сбросить фильтр
+          </button>
+        )}
       </div>
 
       {transactions.length === 0 ? (
-        <p className="empty-state">Записи о доходах и расходах пока отсутствуют.</p>
+        <div>
+          <p>Записи отсутствуют. Добавьте первую транзакцию!</p>
+          <Link to="/transactions/new">Создать транзакцию</Link>
+        </div>
+      ) : visibleTransactions.length === 0 ? (
+        <div>
+          <p>Нет транзакций, соответствующих выбранному фильтру.</p>
+          <button type="button" onClick={() => setTypeFilter('all')}>
+            Показать все
+          </button>
+        </div>
       ) : (
-        <div className="transaction-list">
-          {transactions.map((transaction) => (
-            <TransactionCard key={transaction.id} transaction={transaction} />
+        <div className="transactions-list">
+          {visibleTransactions.map((tx) => (
+            <TransactionCard key={tx.id} transaction={tx} />
           ))}
         </div>
       )}
     </section>
-  )
+  );
 }

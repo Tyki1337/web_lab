@@ -1,13 +1,35 @@
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom';
+import { TransactionForm } from '../components/TransactionForm';
+import type { TransactionDraft } from '../types/transaction.type';
 
-export function NewTransactionPage() {
+type NewTransactionPageProps = {
+  onCreate: (draft: TransactionDraft) => string;
+};
+
+const emptyTransaction: TransactionDraft = {
+  title: '',
+  amount: 0,
+  type: 'expense',
+  category: '',
+  date: new Date().toISOString().split('T')[0],
+};
+
+export function NewTransactionPage({ onCreate }: NewTransactionPageProps) {
+  const navigate = useNavigate();
+
+  function handleSave(draft: TransactionDraft) {
+    const id = onCreate(draft);
+    navigate(`/transactions/${id}`);
+  }
+
   return (
     <section>
-      <h1>Создание операции</h1>
-      <p>Форма создания и сохранения новых транзакций появится в Лабораторной работе №3.</p>
-      <Link to="/transactions" className="btn">
-        Вернуться к списку операций
-      </Link>
+      <h1>Создание транзакции</h1>
+      <TransactionForm
+        initialValues={emptyTransaction}
+        onSave={handleSave}
+        onCancel={() => navigate('/transactions')}
+      />
     </section>
-  )
+  );
 }
