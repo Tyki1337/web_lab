@@ -1,7 +1,14 @@
 import { Link } from "react-router-dom";
-import type { TransactionCardProps } from "../types/transaction.type";
+import { getCategoryName } from "../utils/transactionForm.utils";
+import type { Transaction } from "../types/transaction.type";
+import type { Category } from "../types/category.types";
 
-export function TransactionCard({ transaction }: TransactionCardProps) {
+type TransactionCardProps = {
+  transaction: Transaction;
+  categories: Category[];
+};
+
+export function TransactionCard({ transaction, categories }: TransactionCardProps) {
   const isIncome = transaction.type === "income";
 
   return (
@@ -12,7 +19,11 @@ export function TransactionCard({ transaction }: TransactionCardProps) {
             {transaction.title}
           </Link>
         </h3>
-        <span className="card-category">{transaction.category}</span>
+        
+        {/* 1. Показываем название категории */}
+        <span className="card-category">
+          {getCategoryName(categories, transaction.category)}
+        </span>
       </div>
 
       <div className="card-meta">
@@ -20,6 +31,8 @@ export function TransactionCard({ transaction }: TransactionCardProps) {
           {isIncome ? "+" : "-"}
           {Math.abs(transaction.amount)} ₽
         </span>
+        
+        {/* 2. Показываем дату в теге <time> */}
         <time className="card-date">{transaction.date}</time>
       </div>
     </article>

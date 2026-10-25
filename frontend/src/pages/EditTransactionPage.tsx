@@ -1,13 +1,16 @@
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { TransactionForm } from '../components/TransactionForm';
-import type { Transaction, TransactionDraft } from '../types/transaction.type';
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { TransactionForm } from "../components/TransactionForm";
+import type { Transaction, TransactionDraft } from "../types/transaction.type";
 
 type EditTransactionPageProps = {
   transactions: Transaction[];
   onUpdate: (id: string, draft: TransactionDraft) => void;
 };
 
-export function EditTransactionPage({ transactions, onUpdate }: EditTransactionPageProps) {
+export function EditTransactionPage({
+  transactions,
+  onUpdate,
+}: EditTransactionPageProps) {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 

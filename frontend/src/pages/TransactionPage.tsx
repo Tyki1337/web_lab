@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { TransactionCard } from '../components/TransactionCard';
+import { useCategories } from '../hooks/useCategories';
 import type { Transaction, TransactionType } from '../types/transaction.type';
 
 type TransactionPageProps = {
@@ -9,6 +10,9 @@ type TransactionPageProps = {
 
 export function TransactionPage({ transactions }: TransactionPageProps) {
   const [typeFilter, setTypeFilter] = useState<TransactionType | 'all'>('all');
+
+  const { load } = useCategories();
+  const categories = load.status === 'success' ? load.data : [];
 
   const visibleTransactions = transactions.filter(
     (item) => typeFilter === 'all' || item.type === typeFilter
@@ -55,7 +59,12 @@ export function TransactionPage({ transactions }: TransactionPageProps) {
       ) : (
         <div className="transactions-list">
           {visibleTransactions.map((tx) => (
-            <TransactionCard key={tx.id} transaction={tx} />
+            /* Передаем загруженный массив categories в карточку */
+            <TransactionCard 
+              key={tx.id} 
+              transaction={tx} 
+              categories={categories} 
+            />
           ))}
         </div>
       )}
