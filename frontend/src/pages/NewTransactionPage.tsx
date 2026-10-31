@@ -1,24 +1,24 @@
-import { useNavigate } from 'react-router-dom';
-import { TransactionForm } from '../components/TransactionForm';
-import type { TransactionDraft } from '../types/transaction.type';
+import { useNavigate } from "react-router-dom";
+import { TransactionForm } from "../components/TransactionForm";
+import type { TransactionDraft } from "../types/transaction.type";
 
 type NewTransactionPageProps = {
-  onCreate: (draft: TransactionDraft) => string;
+  onCreate: (draft: TransactionDraft) => Promise<string>;
 };
 
 const emptyTransaction: TransactionDraft = {
-  title: '',
+  title: "",
   amount: 0,
-  type: 'expense',
-  category: '',
-  date: new Date().toISOString().split('T')[0],
+  type: "expense",
+  category: "",
+  date: new Date().toISOString().split("T")[0],
 };
 
 export function NewTransactionPage({ onCreate }: NewTransactionPageProps) {
   const navigate = useNavigate();
 
-  function handleSave(draft: TransactionDraft) {
-    const id = onCreate(draft);
+  async function handleSave(draft: TransactionDraft) {
+    const id = await onCreate(draft);
     navigate(`/transactions/${id}`);
   }
 
@@ -28,7 +28,7 @@ export function NewTransactionPage({ onCreate }: NewTransactionPageProps) {
       <TransactionForm
         initialValues={emptyTransaction}
         onSave={handleSave}
-        onCancel={() => navigate('/transactions')}
+        onCancel={() => navigate("/transactions")}
       />
     </section>
   );

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AppLayout } from "./app/AppLayout";
 import { TransactionPage } from "./pages/TransactionPage";
@@ -6,45 +5,54 @@ import { NewTransactionPage } from "./pages/NewTransactionPage";
 import { EditTransactionPage } from "./pages/EditTransactionPage";
 import { TransactionDetailsPage } from "./pages/TransactionDetailsPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
-import { transactions as initialTransactions } from "./data/transactions.data";
-import type { Transaction, TransactionDraft } from "./types/transaction.type";
+import { AuthForm } from "./components/AuthForm";
+import { useAuth } from "./hooks/useAuth";
+import { useTransactions } from "./hooks/useTransactions";
 import "./App.css";
 
 export function App() {
-  const [transactions, setTransactions] = useState<Transaction[]>(() =>
-    initialTransactions.map((item) => ({ ...item })),
-  );
+  const { user, loading: authLoading } = useAuth();
+  
+  const {
+    transactions,
+    loading: txLoading,
+    error: txError,
+    createTransaction,
+    updateTransaction,
+    deleteTransaction,
+  } = useTransactions(user?.id);
 
-  function createTransaction(draft: TransactionDraft): string {
-    const id = crypto.randomUUID();
-    setTransactions((current) => [...current, { ...draft, id }]);
-    return id;
+  if (authLoading) {
+    return <div style={{ textAlign: "center", marginTop: "50px" }}>Загрузка сессии...</div>;
   }
 
-  function updateTransaction(id: string, draft: TransactionDraft): void {
-    setTransactions((current) =>
-      current.map((item) =>
-        item.id === id ? { ...draft, id: item.id } : item,
-      ),
-    );
-  }
-
-  function deleteTransaction(id: string): void {
-    setTransactions((current) => current.filter((item) => item.id !== id));
+  if (!user) {
+    return <AuthForm />;
   }
 
   return (
     <Routes>
       <Route path="/" element={<AppLayout />}>
         <Route index element={<Navigate to="/transactions" replace />} />
+        
         <Route
           path="transactions"
-          element={<TransactionPage transactions={transactions} />}
+          element={
+            txLoading ? (
+              <p style={{ padding: "20px" }}>Загрузка ваших транзакций...</p>
+            ) : txError ? (
+              <p style={{ padding: "20px", color: "red" }}>Ошибка: {txError}</p>
+            ) : (
+              <TransactionPage transactions={transactions} />
+            )
+          }
         />
+        
         <Route
           path="transactions/new"
           element={<NewTransactionPage onCreate={createTransaction} />}
         />
+        
         <Route
           path="transactions/:id"
           element={
@@ -54,6 +62,7 @@ export function App() {
             />
           }
         />
+        
         <Route
           path="transactions/:id/edit"
           element={
@@ -63,6 +72,7 @@ export function App() {
             />
           }
         />
+        
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

@@ -14,7 +14,7 @@ export function useCategories() {
   useEffect(() => {
     const controller = new AbortController();
     let active = true;
-
+    // eslint-disable-next-line
     setLoad({ status: "loading" });
 
     getCategories(controller.signal)
