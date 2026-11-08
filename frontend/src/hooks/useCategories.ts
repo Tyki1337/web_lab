@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import type { Category } from "../types/category.types";
 import { getCategories } from "../services/categories";
 
@@ -14,7 +14,7 @@ export function useCategories() {
   useEffect(() => {
     const controller = new AbortController();
     let active = true;
-    // eslint-disable-next-line
+
     setLoad({ status: "loading" });
 
     getCategories(controller.signal)
@@ -23,6 +23,10 @@ export function useCategories() {
       })
       .catch((error: unknown) => {
         if (!active) return;
+        
+        // Игнорируем ошибку отмены запроса
+        if (error instanceof Error && error.name === 'AbortError') return;
+
         const message =
           error instanceof Error
             ? error.message
@@ -36,10 +40,10 @@ export function useCategories() {
     };
   }, [attempt]);
 
-  function retry() {
+  const retry = useCallback(() => {
     setLoad({ status: "loading" });
     setAttempt((current) => current + 1);
-  }
+  }, []);
 
   return { load, retry };
 }

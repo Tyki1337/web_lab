@@ -1,19 +1,25 @@
-import { Outlet, Link, useNavigate } from "react-router-dom";
+import { Outlet, Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth"; // Путь к вашему хуку useAuth
 
 export function AppLayout() {
   const { user, signOut } = useAuth();
-  const navigate = useNavigate();
 
   const handleSignOut = async () => {
     await signOut();
-    navigate("/"); // Перенаправляем на экран авторизации после выхода
+    window.location.reload();
   };
 
   return (
     <div className="layout">
       {/* Шапка с разделением названия и ссылок */}
-      <header className="header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <header
+        className="header"
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
         <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
           <div className="brand">Expense Tracker</div>
           <nav className="nav">
@@ -25,8 +31,10 @@ export function AppLayout() {
         {/* Блок пользователя и кнопка выхода */}
         {user && (
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <span style={{ fontSize: "14px", color: "#555" }}>{user.email}</span>
-            <button 
+            <span style={{ fontSize: "14px", color: "#555" }}>
+              {user.email}
+            </span>
+            <button
               onClick={handleSignOut}
               style={{
                 padding: "6px 12px",
@@ -35,7 +43,7 @@ export function AppLayout() {
                 color: "#fff",
                 border: "none",
                 borderRadius: "4px",
-                fontSize: "13px"
+                fontSize: "13px",
               }}
             >
               Выйти
