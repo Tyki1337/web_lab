@@ -1,12 +1,13 @@
-import { Outlet, Link } from "react-router-dom";
+import { Outlet, Link, useNavigate, replace } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth"; // Путь к вашему хуку useAuth
 
 export function AppLayout() {
   const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   const handleSignOut = async () => {
     await signOut();
-    window.location.reload();
+    navigate("/", { replace: true });
   };
 
   return (

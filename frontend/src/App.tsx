@@ -12,9 +12,7 @@ import "./App.css";
 
 export function App() {
   const { user, loading: authLoading } = useAuth();
-  
-  // Хук транзакций вызываем всегда, но внутри себя он делает запросы 
-  // только если есть авторизация
+
   const {
     transactions,
     loading: txLoading,
@@ -25,63 +23,61 @@ export function App() {
   } = useTransactions();
 
   if (authLoading) {
-    return <div style={{ textAlign: "center", marginTop: "50px" }}>Загрузка сессии...</div>;
+    return (
+      <div style={{ textAlign: "center", marginTop: "50px" }}>
+        Загрузка сессии...
+      </div>
+    );
   }
 
   return (
     <Routes>
-      {/* Если пользователь не авторизован, корень ведет на AuthForm */}
-      {!user ? (
-        <>
-          <Route path="/" element={<AuthForm />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </>
-      ) : (
-        /* Если авторизован, доступны все защищенные маршруты */
-        <Route path="/" element={<AppLayout />}>
-          <Route index element={<Navigate to="/transactions" replace />} />
-          
-          <Route
-            path="transactions"
-            element={
-              txLoading ? (
-                <p style={{ padding: "20px" }}>Загрузка ваших транзакций...</p>
-              ) : txError ? (
-                <p style={{ padding: "20px", color: "red" }}>Ошибка: {txError}</p>
-              ) : (
-                <TransactionPage transactions={transactions} />
-              )
-            }
-          />
-          
-          <Route
-            path="transactions/new"
-            element={<NewTransactionPage onCreate={createTransaction} />}
-          />
-          
-          <Route
-            path="transactions/:id"
-            element={
-              <TransactionDetailsPage
-                transactions={transactions}
-                onDelete={deleteTransaction}
-              />
-            }
-          />
-          
-          <Route
-            path="transactions/:id/edit"
-            element={
-              <EditTransactionPage
-                transactions={transactions}
-                onUpdate={updateTransaction}
-              />
-            }
-          />
-          
-          <Route path="*" element={<NotFoundPage />} />
-        </Route>
-      )}
+      {/* Корень: форма входа для гостя, редирект на операции для авторизованного */}
+      <Route
+        path="/"
+        element={user ? <Navigate to="/transactions" replace /> : <AuthForm />}
+      />
+
+      {/* Защищённая зона: без user любой путь отправляет на / */}
+      <Route
+        element={user ? <AppLayout /> : <Navigate to="/" replace />}
+      >
+        <Route
+          path="transactions"
+          element={
+            txLoading ? (
+              <p style={{ padding: "20px" }}>Загрузка ваших транзакций...</p>
+            ) : txError ? (
+              <p style={{ padding: "20px", color: "red" }}>Ошибка: {txError}</p>
+            ) : (
+              <TransactionPage transactions={transactions} />
+            )
+          }
+        />
+        <Route
+          path="transactions/new"
+          element={<NewTransactionPage onCreate={createTransaction} />}
+        />
+        <Route
+          path="transactions/:id"
+          element={
+            <TransactionDetailsPage
+              transactions={transactions}
+              onDelete={deleteTransaction}
+            />
+          }
+        />
+        <Route
+          path="transactions/:id/edit"
+          element={
+            <EditTransactionPage
+              transactions={transactions}
+              onUpdate={updateTransaction}
+            />
+          }
+        />
+        <Route path="*" element={<NotFoundPage />} />
+      </Route>
     </Routes>
   );
 }
